@@ -368,6 +368,14 @@ namespace EFSAMessageCreator
                     PropertyInfo[] props = t.GetProperties();
                     foreach (PropertyInfo p in props)
                     {
+                        string attributeName = string.Empty;
+                        if (p.GetCustomAttribute(typeof(XmlElementAttribute)) != null)
+                        {
+                            XmlElementAttribute attr = (XmlElementAttribute)p.GetCustomAttribute(typeof(XmlElementAttribute));
+                            attributeName = attr.ElementName;
+                            this.CreateXMLElement(attributeName, row, resultObject, elementMappingTable);
+                        }
+
                         this.CreateXMLElement(p.Name, row, resultObject, elementMappingTable);
                     }
 
@@ -406,7 +414,7 @@ namespace EFSAMessageCreator
                 // If there is conent, create the XML element, otherwise skip
                 if (givenString != string.Empty)
                 {
-                    PropertyInfo prop = resultObject.GetType().GetProperty(resultElementName, BindingFlags.Public | BindingFlags.Instance);
+                    PropertyInfo prop = resultObject.GetType().GetProperty(resultElementName.Replace(".",""), BindingFlags.Public | BindingFlags.Instance);
                     if (prop != null && prop.CanWrite)
                     {
                         if (prop.PropertyType == typeof(string))
